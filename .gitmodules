@@ -1,0 +1,12 @@
+[submodule "msth-datasets"]
+	path = msth-datasets
+	url = git@github.com:olaals/msth-datasets.git
+[submodule "multivision"]
+	path = multivision
+	url = git@github.com:olaals/multivision.git
+[submodule "object-dataset-generator"]
+	path = object-dataset-generator
+	url = git@github.com:olaals/object-dataset-generator.git
+[submodule "render-dataset-generator"]
+	path = render-dataset-generator
+	url = git@github.com:olaals/render-dataset-generator.git
