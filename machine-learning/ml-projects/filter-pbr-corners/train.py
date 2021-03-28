@@ -6,14 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import sys
-import argparse
-import yaml
 import time
+import os
+from importlib import import_module
 
 # Same directory imports
-sys.path.append('models')
+sys.path.append('models/models')
 from dataloaders import get_dataloaders
-from model import CustomModel
+#from model import CustomModel
 from utils import *
 
 # Run on GPU
@@ -32,7 +32,15 @@ num_epochs = int(config["epochs"])
 val_frac = float(config["validation_fraction"])
 train_dir_path = config["train_dir"]
 gt_dir_path = config["gt_dir"]
-plots_path = config["plots_dir"]
+plots_dir = config["plots_dir"]
+model_save_dir = config["model_save_dir"]
+model = config["model"]
+plots_path = os.path.join(plots_dir, model)
+os.mkdir(plots_path)
+
+
+model_save_path = os.path.join(model_save_dir, model) + ".pth"
+
 
 
 # Get dataloaders
@@ -40,7 +48,8 @@ train_loader, val_loader = get_dataloaders(train_dir_path, gt_dir_path, batch_si
 
 
 # Import model
-model = CustomModel()
+model_module = import_module(model)
+model = model_module.CustomModel()
 model.cuda()
 
 # Set criterion and optimizer
@@ -51,6 +60,7 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 # Train
 since = time.time()
 for epoch in range(num_epochs):
+    model.train()
     show_img = True
     print('Epoch {}/{}'.format(epoch, num_epochs - 1))
     print('-' * 10)
@@ -71,6 +81,7 @@ for epoch in range(num_epochs):
     epoch_loss = running_loss / len(train_loader)
     print('Training Loss: {:.4f}'.format(epoch_loss))
     val_iter = 0
+    model.eval()
     with torch.no_grad():
         val_iter += 1
         val_running_loss = 0
@@ -114,5 +125,4 @@ for epoch in range(num_epochs):
 
 time_elapsed = time.time() - since
 print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-torch.save(model.state_dict(), 
-#torch.save(model.state_dict(), "model.bin")
+torch.save(model.state_dict(), model_save_path)

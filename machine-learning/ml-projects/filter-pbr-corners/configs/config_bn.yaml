@@ -1,4 +1,4 @@
-batch_size: 12
+batch_size: 8
 learning_rate: 0.0003
 input_channels: 3
 input_width: 500
@@ -12,6 +12,6 @@ validation_fraction: 0.2
 test_dir: dataset/real-scans-v1-resized
 
 plots_dir: plots
-model: model
+model: model_bn
 model_save_dir: models/saved
 

@@ -29,12 +29,13 @@ def scale_image(img):
     img = to_min + (img-from_min)*(to_max-to_min)/(from_max-from_min)
     return img
 
-def plot_2d_list_of_images(list_of_lists_of_imgs, save_path):
+def plot_2d_list_of_images(list_of_lists_of_imgs, save_path=None):
     plt.rcParams["figure.figsize"] = (20,20)
     l_imgs = list_of_lists_of_imgs
     num_vert_imgs = len(l_imgs)
     num_hori_imgs = len(l_imgs[0])
     fig, axs = plt.subplots(num_vert_imgs, num_hori_imgs)
+    fig.subplots_adjust(hspace=0, wspace=0)
     img_iter = 0
     for r in range(num_vert_imgs):
         print(r)
@@ -49,7 +50,32 @@ def plot_2d_list_of_images(list_of_lists_of_imgs, save_path):
                 print("Something weird with the image")
                 assert(False)
             img_iter += 1
-    fig.savefig(save_path + ".png", format='png')
+    if save_path:
+        fig.savefig(save_path + ".png", format='png')
+
+def plot_1d_list_of_images(list_of_images, save_path=None):
+    plt.rcParams["figure.figsize"] = (20,20)
+    l_imgs = list_of_images
+    num_imgs = len(l_imgs)
+    fig, axs = plt.subplots(num_imgs)
+    fig.subplots_adjust(hspace=0, wspace=0)
+    img_iter = 0
+    for i in range(num_imgs):
+        img_to_plot = np.copy(l_imgs[i])
+        axs[i].axis('off')
+        if len(np.shape(img_to_plot)) == 2:
+            axs[i].imshow(l_imgs[i], cmap='gray')
+        elif np.shape(img_to_plot)[2] == 3:
+            axs[i].imshow(l_imgs[i])
+        else:
+            print("Something weird with the image")
+            assert(False)
+        img_iter += 1
+    if save_path:
+        fig.savefig(save_path + ".png", format='png')
+    else:
+        plt.show()
+
 
 
     
