@@ -1,0 +1,14 @@
+batch_size: 32
+learning_rate: 0.0003
+input_channels: 3
+input_width: 300
+input_height: 300
+output_size: 90000
+epochs: 15
+
+train_dir: dataset/corner-scans-v1/train-filt
+gt_dir: dataset/corner-scans-v1/ground-truth
+validation_fraction: 0.2
+
+plots_dir: plots/first-plots
+

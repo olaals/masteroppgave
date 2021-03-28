@@ -1,0 +1,12 @@
+batch_size: 8
+learning_rate: 0.0003
+input_channels: 3
+input_width: 300
+input_height: 300
+output_size: 90000
+epochs: 3
+
+train_dir: relativepath/to/train_dir
+gt_dir: relativepath/to/gt_dir
+validation_fraction: 0.2
+
