@@ -54,6 +54,7 @@ train_loader, val_loader = get_dataloaders(train_dir_path, gt_dir_path, batch_si
 # Import model
 model_module = import_module(model)
 model = model_module.CustomModel()
+model.load_state_dict(torch.load(model_save_path))
 model.cuda()
 
 # Set criterion and optimizer
@@ -80,10 +81,10 @@ for epoch in range(num_epochs):
         optimizer.step()
         optimizer.zero_grad()
         running_loss += loss.item() * X_batch.size(0)
-        counter += 1
-        tqdm_iter.set_postfix(loss=(running_loss / (counter * train_loader.batch_size)))
-    epoch_loss = running_loss / len(train_loader)
-    print('Training Loss: {:.4f}'.format(epoch_loss))
+        counter += X_batch.size(0)
+        tqdm_iter.set_postfix(loss=(running_loss / counter))
+    epoch_loss = running_loss / counter
+    print('Training Loss: {:.5f}'.format(epoch_loss))
     val_iter = 0
     model.eval()
     with torch.no_grad():
@@ -92,8 +93,10 @@ for epoch in range(num_epochs):
         save_imgs = []
         num_save_val_imgs = 3
         epoch_imgs = []
+        val_counter = 0
 
         for X_batch, Y_batch in val_loader:
+            val_counter += X_batch.size(0)
             X_batch = X_batch.to(device='cuda')
             Y_batch = Y_batch.to(device='cuda')
             outputs = model(X_batch)
@@ -121,8 +124,8 @@ for epoch in range(num_epochs):
                 epoch_imgs.append(save_imgs)
 
         plot_2d_list_of_images(epoch_imgs, plots_path + "/" + "val_epoch" + str(epoch))
-        val_loss = val_running_loss / len(val_loader)
-        print('Validation Loss: {:.4f}'.format(val_loss))
+        val_loss = val_running_loss / val_counter
+        print('Validation Loss: {:.5f}'.format(val_loss))
         
 
 

@@ -1,17 +1,17 @@
-batch_size: 6
-learning_rate: 0.0003
+batch_size: 8
+learning_rate: 0.0005
 input_channels: 3
 input_width: 500
 input_height: 500
 output_size: 90000
-epochs: 10
+epochs: 5
 
 train_dir: dataset/corner-scan-v2/train-raw
 gt_dir: dataset/corner-scan-v2/ground-truth
-validation_fraction: 0.1
+validation_fraction: 0.2
 test_dir: dataset/real-scans-v1-resized
 
 plots_dir: plots
-model: wide
+model: local
 model_save_dir: models/saved
 
