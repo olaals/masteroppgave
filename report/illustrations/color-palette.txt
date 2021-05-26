@@ -1,0 +1,4 @@
+dark red: 932432
+NTNU blue: 004794
+
+
