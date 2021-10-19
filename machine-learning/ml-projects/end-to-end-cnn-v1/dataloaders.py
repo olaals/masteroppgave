@@ -70,17 +70,78 @@ class DoubleScanV1(Dataset):
     def __init__(self, transforms=None):
         super().__init__()
         self.transforms = transforms
-        dataset_dir = os.path.join("datasets","double-scan-v1")
+        dataset_dir = os.path.join("datasets","double-scan-v3")
 
         self.imgs_paths = [os.path.join(dataset_dir, scan_dir, "img_l.png") for scan_dir in os.listdir(dataset_dir)]
         self.segs_paths = [os.path.join(dataset_dir, scan_dir, "gt_scan.png") for scan_dir in os.listdir(dataset_dir)]
         self.imgs_paths.sort()
         self.segs_paths.sort()
-        
-        print(len(self.imgs_paths))
-        print(len(self.segs_paths))
-        print(self.imgs_paths[:3])
-        print(self.segs_paths[:3])
+        self.imgs_paths = self.imgs_paths[:4000]
+        self.segs_paths = self.segs_paths[:4000]
+
+    def __len__(self):
+        return len(self.imgs_paths)
+
+    def __getitem__(self, idx):
+
+        img = np.array(Image.open(self.imgs_paths[idx]).convert("RGB"))
+        img[:,:,1] = 0
+        img[:,:,2] = 0
+        seg = np.array(Image.open(self.segs_paths[idx]).convert("L"))
+        seg = seg.clip(max=1)
+
+        if self.transforms:
+            augmentations = self.transforms(image=img, mask=seg)
+            img = augmentations["image"]
+            seg = augmentations["mask"]
+
+
+        #plt.imshow(img)
+        #plt.show()
+
+        img = torch.tensor(img, dtype=torch.float32).permute([2,0,1])
+        seg = torch.tensor(seg, dtype=torch.torch.int64)
+
+        return img,seg
+
+
+    def get_np_img(self, idx):
+        img = np.array(Image.open(self.imgs_paths[idx]).convert("RGB"))
+        return img
+
+    def get_np_mask(self, idx):
+        seg = np.array(Image.open(self.segs_paths[idx]).convert("L"))
+        seg = seg.clip(max=1)
+        return seg
+
+def get_test_blurry_loader(batch_size):
+    train_transforms = A.Compose([
+            A.CLAHE(p=1.0),
+            A.Blur(blur_limit=[5,5],p=1.0),
+            #A.Normalize(mean=[0.0],std=[1.0], max_pixel_value=255),
+
+            ])
+    ds_blurry = Testset("test-blurry", transforms=train_transforms)
+    ds_spec = Testset("test-specular", transforms=train_transforms)
+    ds_pbr = Testset("test-pbr", transforms=train_transforms)
+
+    test_blurry = DataLoader(ds_blurry, batch_size, shuffle=False)
+    test_specular = DataLoader(ds_spec, batch_size, shuffle=False)
+    test_pbr = DataLoader(ds_pbr, batch_size, shuffle=False)
+    return test_blurry, test_specular, test_pbr
+
+class Testset(Dataset):
+    def __init__(self, dataset_dir, transforms=None):
+        super().__init__()
+        self.transforms = transforms
+        dataset_dir = os.path.join("datasets",dataset_dir)
+
+        self.imgs_paths = [os.path.join(dataset_dir, scan_dir, "img_l.png") for scan_dir in os.listdir(dataset_dir)]
+        self.segs_paths = [os.path.join(dataset_dir, scan_dir, "gt_scan.png") for scan_dir in os.listdir(dataset_dir)]
+        self.imgs_paths.sort()
+        self.segs_paths.sort()
+        self.imgs_paths = self.imgs_paths
+        self.segs_paths = self.segs_paths
 
     def __len__(self):
         return len(self.imgs_paths)
@@ -90,6 +151,7 @@ class DoubleScanV1(Dataset):
         img = np.array(Image.open(self.imgs_paths[idx]).convert("RGB"))
         seg = np.array(Image.open(self.segs_paths[idx]).convert("L"))
         seg = seg.clip(max=1)
+
 
         if self.transforms:
             augmentations = self.transforms(image=img, mask=seg)
@@ -111,8 +173,6 @@ class DoubleScanV1(Dataset):
         seg = np.array(Image.open(self.segs_paths[idx]).convert("L"))
         seg = seg.clip(max=1)
         return seg
-
-
 
     
 

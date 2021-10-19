@@ -78,6 +78,10 @@ class DoubleScanV1(Dataset):
         self.imgs_paths_l.sort()
         self.imgs_paths_proj.sort()
         self.segs_paths.sort()
+
+        self.segs_paths=         self.segs_paths[:120]
+        self.imgs_paths_proj=   self.imgs_paths_proj[:120]
+        self.imgs_paths_l=      self.imgs_paths_l[:120]
         
         print(len(self.imgs_paths_l))
         print(len(self.segs_paths))

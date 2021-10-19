@@ -10,7 +10,7 @@ def convert_tensor_to_RGB(network_output):
 
 
 def dice_scores(segmentation, ground_truth, classes):
-    dice_scores = []
+    dice_score = 0
     for i in range(1,classes+1):
         binary_gt = (ground_truth == i).astype(np.uint8)
         binary_seg = (segmentation == i).astype(np.uint8)
@@ -18,11 +18,14 @@ def dice_scores(segmentation, ground_truth, classes):
         sum_binary_gt = np.sum(binary_gt)
         sum_binary_seg = np.sum(binary_seg)
         if sum_binary_gt == 0:
-            continue
+            return 0.9
         class_dice_score = np.sum(intersect)*2 / (sum_binary_gt+sum_binary_seg)
-        dice_scores.append(class_dice_score)
-    dice_scores = np.array(dice_scores)
-    return dice_scores
+        return class_dice_score
+    print(dice_score)
+    print(segmentation.shape)
+    print(ground_truth.shape)
+    print(classes)
+    
 
 
 
@@ -86,13 +89,14 @@ def weighted_combined_loss(loss_fn1, loss_fn2, weight=0.5):
 
 def mean_dice_score(pred_batch, Y_batch, classes):
     assert(pred_batch.size(0) == Y_batch.size(0))
-    cumulative_scores = np.zeros(classes)
+    cumulative_scores = 0
     for b_idx in range(pred_batch.size(0)):
         mask = predb_to_mask(pred_batch, b_idx).numpy()
         gt_tensor = Y_batch[b_idx].clone()
         gt = gt_tensor.cpu().numpy()
 
         batch_dice_score = dice_scores(mask, gt, classes)
+        #print("Batch dice score:", batch_dice_score, "cumulative_scores", cumulative_scores)
 
         cumulative_scores += batch_dice_score
 

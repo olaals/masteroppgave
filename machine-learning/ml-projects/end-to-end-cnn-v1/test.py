@@ -60,7 +60,7 @@ def test(model, test_dl, other_logdir):
     print(other_logdir)
     
     with torch.no_grad():
-        for i,X_batch in enumerate(test_dl):
+        for i,(X_batch, Y_batch) in enumerate(test_dl):
             X_batch = X_batch.cuda()
             
             outputs = model(X_batch)
@@ -138,7 +138,8 @@ def init_test(cfg, model_folder, hparam_search_dir=""):
 
     loss_fn = torch.nn.CrossEntropyLoss(weight=torch.tensor(cross_entr_weights).cuda())
 
-    test_loader = get_realscan_v1_loader(4, val_transforms)
+    test_loader = get_test_blurry_loader(4)
+    print(len(test_loader))
 
     test(unet, test_loader, other_logdir)
 
