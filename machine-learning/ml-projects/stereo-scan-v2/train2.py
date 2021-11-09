@@ -43,6 +43,8 @@ def train_step(X_batch, Y_batch, optimizer, model, loss_fn, acc_fn):
     optimizer.zero_grad()
     outputs = model(X_batch)
     loss = loss_fn(outputs, Y_batch)
+    print(outputs.shape, Y_batch.shape)
+    assert(False)
     loss.backward()
     optimizer.step()
     acc = acc_fn(outputs, Y_batch)
